@@ -1,0 +1,16 @@
+{
+    "upload_success": "Datei erfolgreich hochgeladen.",
+    "upload_error": "Datei konnte nicht hochgeladen werden.",
+    "download_success": "Datei erfolgreich heruntergeladen.",
+    "download_error": "Fehler beim Herunterladen der Datei.",
+    "select_service": "Dienst wählen",
+    "bucket_container_name": "Bucket/Container Name (optional)",
+    "select_file": "Datei auswählen",
+    "upload": "Hochladen",
+    "file_id": "Datei-ID",
+    "destination_path": "Zielpfad",
+    "download": "Herunterladen",
+    "service": "Dienst",
+    "file": "Datei",
+    "bucket": "Bucket"
+}

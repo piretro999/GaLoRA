@@ -1,0 +1,16 @@
+{
+    "upload_success": "File uploaded successfully.",
+    "upload_error": "Failed to upload file.",
+    "download_success": "File downloaded successfully.",
+    "download_error": "Failed to download file.",
+    "select_service": "Select Service",
+    "bucket_container_name": "Bucket/Container Name (optional)",
+    "select_file": "Select File",
+    "upload": "Upload",
+    "file_id": "File ID",
+    "destination_path": "Destination Path",
+    "download": "Download",
+    "service": "Service",
+    "file": "File",
+    "bucket": "Bucket"
+}

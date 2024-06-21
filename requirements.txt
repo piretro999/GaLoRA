@@ -1,0 +1,17 @@
+boto3
+azure-storage-blob
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
+PyMuPDF
+python-pptx
+moviepy
+speechrecognition
+pydub
+pandas
+ebooklib
+beautifulsoup4
+python-docx
+python-vlc
+requests
