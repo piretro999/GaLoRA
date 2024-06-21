@@ -89,7 +89,7 @@ To run Galora, you need to have the following dependencies installed:
 
 2. Install the required packages:
     ```sh
-    pip install -r prerequisites.txt
+    pip install -r requirements.txt
     ```
 
 ## Usage
@@ -160,6 +160,9 @@ To run Galora, you need to have the following dependencies installed:
     ```sh
     ./transcode_media.bat
     ```
+## Some hints and help
+I provided you with some batch files to test the Galora functionalities
+
 
 ## License
 
