@@ -8,7 +8,7 @@ GaLoRA is the definitive evolution of the previous solutions Lora Help and Magic
 - **Transliteration**: Convert text files into a standardized format, useful for pre-processing text data for NLP models.
 - **JSON Creation**: Automatically generate JSON files from text files by identifying and extracting content based on specified keywords.
 - **Directory Management**: Download entire directories from cloud storage to a local path for batch processing.
-- **Media Transcoding**: Convert media files between different formats to ensure compatibility with various AI models.
+- **Media srt production**: Create the subtitle files for big audio end video files so thay are more understandable both for AI and humans: this also overpass the limit of the need of small video and audio file for translitteration.
 
 ## Components
 
@@ -154,11 +154,11 @@ To run GaLoRA, you need to have the following dependencies installed:
     ./download_directory.bat
     ```
 
-### Transcoding Media Files
+### Producing the SRT from Media Files
 
-- To transcode media files:
+- To Generatr srt from media files:
     ```sh
-    ./transcode_media.bat
+    ./generate_srt_file.bat
     ```
 ## Some hints and help
 I provided you with some batch files to test the Galora functionalities
