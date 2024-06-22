@@ -38,7 +38,7 @@ A Local Resource Access (LoRA) manager like Galora is designed to facilitate the
 
 ### 1. Building Knowledge Bases
 
-Organizations can use Galora to upload and manage internal documentation, research papers, and reports to cloud storage. The AI models can then process this data to create a comprehensive knowledge base that employees can query to find relevant information quickly.
+Organizations can use GaLoRA to upload and manage internal documentation, research papers, and reports to cloud storage. The AI models can then process this data to create a comprehensive knowledge base that employees can query to find relevant information quickly.
 
 ### 2. Training Chatbots
 
@@ -46,7 +46,7 @@ Companies can use Galora to collect and manage customer service interactions, em
 
 ### 3. Document Management
 
-Businesses can use Galora to automate the process of uploading, categorizing, and managing documents such as contracts, invoices, and HR files. AI models can then analyze these documents to extract key information, detect anomalies, and ensure compliance.
+Businesses can use GaLoRA to automate the process of uploading, categorizing, and managing documents such as contracts, invoices, and HR files. AI models can then analyze these documents to extract key information, detect anomalies, and ensure compliance.
 
 ### 4. Research and Development
 
@@ -58,7 +58,7 @@ Media companies can use Galora to manage large volumes of video, audio, and text
 
 ## Prerequisites
 
-To run Galora, you need to have the following dependencies installed:
+To run GaLoRA, you need to have the following dependencies installed:
 
 - Python 3.x
 - boto3
