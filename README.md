@@ -1,6 +1,6 @@
-# Galora
+# GaLoRA
 
-Galora is the definitive evolution of the previous solutions Lora Help and MagicALora. This solution represents the future development under the name Galora, providing enhanced features and capabilities for managing and processing content for AI systems using Local Resource Access (LoRa) technology.
+GaLoRA is the definitive evolution of the previous solutions Lora Help and MagicALora. This solution represents the future development under the name GaLoRA, providing enhanced features and capabilities for managing and processing content for AI systems using Local Resource Access (LoRa) technology.
 
 ## Features
 
@@ -30,9 +30,9 @@ The GUI component provides a user-friendly interface that simplifies interaction
 - **Visualization**: Better visualization of processes and data, making it easier to manage complex tasks.
 - **Accessibility**: Accessible to users who are not comfortable with command-line operations.
 
-## What is a Local Resource Access (LoRa) Manager?
+## What is a Local Resource Access (LoRA) Manager?
 
-A Local Resource Access (LoRa) manager like Galora is designed to facilitate the seamless management and processing of large unstructured, semistructureed and structured datasets (documents in various formats), ensuring efficient feeding of AI systems. Galora leverages LoRa technology to handle the flow of data between local and cloud storage, making sure that AI models have access to up-to-date and relevant data without manual intervention.
+A Local Resource Access (LoRA) manager like Galora is designed to facilitate the seamless management and processing of large unstructured, semistructureed and structured datasets (documents in various formats), ensuring efficient feeding of AI systems. Galora leverages LoRa technology to handle the flow of data between local and cloud storage, making sure that AI models have access to up-to-date and relevant data without manual intervention.
 
 ## Use Cases
 
