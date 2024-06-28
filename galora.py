@@ -7,6 +7,7 @@ Created on Mon Jun 17 16:01:34 2024
 
 import boto3
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
+from tkinter import filedialog, messagebox, ttk
 from azure.storage.blob import BlobServiceClient
 import json
 import os
@@ -38,6 +39,8 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
 import subprocess
 
+# Global variable for language
+lang = {}
 # Configure logging
 log_dir = "log"
 temp_dir = "temp"
@@ -299,6 +302,7 @@ def handle_file(file_path):
         '.txt': handle_text_file,
         '.htm': handle_text_file,
         '.html': handle_text_file,
+        '.srt': handle_text_file,
         '.pdf': handle_pdf_file,
         '.docx': handle_word_file,
         '.doc': handle_word_file,
@@ -437,47 +441,70 @@ def download_vimeo_video(url):
         log_message('Error downloading Vimeo video: {}', 'error', str(e))
         return None
 
-# Generate SRT file from audio
-def generate_srt(audio_file, output_file, language='it-IT'):
-    recognizer = sr.Recognizer()
-    sound = AudioSegment.from_wav(audio_file)
-    chunks = split_on_silence(sound, min_silence_len=500, silence_thresh=sound.dBFS-14, keep_silence=500)
+def extract_audio(video_file):
+    try:
+        video = VideoFileClip(video_file)
+        audio = video.audio
+        audio_file = os.path.join(temp_dir, "temp_audio.wav")
+        audio.write_audiofile(audio_file, codec='pcm_s16le')
+        video.close()
+        logging.info(f"Extracted audio to: {audio_file}")
+        print(f"Extracted audio to: {audio_file}")  # Debug
+        return audio_file
+    except Exception as e:
+        logging.error(f"Error extracting audio: {e}")
+        print(f"Error extracting audio: {e}")  # Debug
+        return None
 
-    with open(output_file, 'w') as file:
-        start = 0
-        for i, chunk in enumerate(chunks):
-            chunk_filename = os.path.join(temp_dir, f"chunk_{datetime.now().strftime('%Y%m%d%H%M%S')}_{i}.wav")
-            chunk.export(chunk_filename, format="wav")
-            with sr.AudioFile(chunk_filename) as source:
-                audio = recognizer.record(source)
-            try:
-                text = recognizer.recognize_google(audio, language=language)
-                duration = len(chunk) / 1000
-                start_time = start
-                end_time = start + duration
-                file.write(f"{i+1}\n")
-                file.write(f"{format_time(start_time)} --> {format_time(end_time)}\n")
-                file.write(f"{text.strip()}\n\n")
-                start += duration
-                log_message('SRT segment generated: {}', 'info', i+1)
-            except sr.UnknownValueError:
-                file.write(f"{i+1}\n")
-                file.write(f"{format_time(start_time)} --> {format_time(end_time)}\n")
-                file.write("Audio not understandable\n\n")
-                start += duration
-                log_message('Audio not understood in segment: {}', 'warning', i+1)
-            except sr.RequestError as e:
-                file.write(f"{i+1}\n")
-                file.write(f"{format_time(start_time)} --> {format_time(end_time)}\n")
-                file.write(f"Service error: {e}\n\n")
-                start += duration
-                log_message('Service error in segment: {} - {}', 'error', i+1, str(e))
-    
-    # Clean up chunk files
-    for chunk_filename in os.listdir(temp_dir):
-        if chunk_filename.startswith("chunk") and chunk_filename.endswith(".wav"):
-            os.remove(os.path.join(temp_dir, chunk_filename))
-            log_message('Removed chunk file: {}', 'info', chunk_filename)
+def generate_srt(video_file, output_file, language='it-IT'):
+    try:
+        # Extract audio from the video file
+        audio_file = extract_audio(video_file)
+        if not audio_file:
+            raise FileNotFoundError("Audio extraction failed.")
+
+        sound = AudioSegment.from_wav(audio_file)
+        chunks = split_on_silence(sound, min_silence_len=500, silence_thresh=sound.dBFS-14, keep_silence=500)
+        
+        with open(output_file, 'w') as file:
+            start = 0
+            for i, chunk in enumerate(chunks):
+                chunk_filename = os.path.join(temp_dir, f"chunk_{i}.wav")
+                chunk.export(chunk_filename, format="wav")
+                with sr.AudioFile(chunk_filename) as source:
+                    audio = sr.Recognizer().record(source)
+                try:
+                    text = sr.Recognizer().recognize_google(audio, language=language)
+                    duration = len(chunk) / 1000
+                    start_time = start
+                    end_time = start + duration
+                    file.write(f"{i+1}\n")
+                    file.write(f"{format_time(start_time)} --> {format_time(end_time)}\n")
+                    file.write(f"{text.strip()}\n\n")
+                    start += duration
+                    logging.info(f"SRT segment {i+1} generated.")
+                except sr.UnknownValueError:
+                    file.write(f"{i+1}\n")
+                    file.write(f"{format_time(start_time)} --> {format_time(end_time)}\n")
+                    file.write("Audio not understandable\n\n")
+                    start += duration
+                    logging.warning(f"Audio not understood in segment {i+1}.")
+                except sr.RequestError as e:
+                    file.write(f"{i+1}\n")
+                    file.write(f"{format_time(start_time)} --> {format_time(end_time)}\n")
+                    file.write(f"Service error: {e}\n\n")
+                    start += duration
+                    logging.error(f"Service error in segment {i+1}: {e}")
+
+        # Clean up chunk files
+        for chunk_filename in os.listdir(temp_dir):
+            if chunk_filename.startswith("chunk") and chunk_filename.endswith(".wav"):
+                os.remove(os.path.join(temp_dir, chunk_filename))
+                logging.info(f"Removed chunk file: {chunk_filename}")
+
+    except Exception as e:
+        logging.error(f"Error generating SRT: {e}")
+        print(f"Error generating SRT: {e}")  # Debug
 
 def format_time(seconds):
     hours = int(seconds // 3600)
@@ -892,6 +919,41 @@ def launch_gui():
         log_message('GUI launched successfully.', 'info')
     except subprocess.CalledProcessError as e:
         log_message('Error launching GUI: {}', 'error', str(e))
+        
+def extract_audio(video_file):
+    try:
+        video = VideoFileClip(video_file)
+        audio = video.audio
+        audio_file = os.path.join(temp_dir, "temp_audio.wav")
+        audio.write_audiofile(audio_file, codec='pcm_s16le')
+        video.close()
+        logging.info(f"Extracted audio to: {audio_file}")
+        print(f"Extracted audio to: {audio_file}")  # Debug
+        return audio_file
+    except Exception as e:
+        logging.error(f"Error extracting audio: {e}")
+        print(f"Error extracting audio: {e}")  # Debug
+        return None
+        
+def process_video(url=None, file_path=None, download_audio_only=False, transcription_lang='en'):
+    if url:
+        video_file = download_youtube_video(url, download_audio_only=download_audio_only)
+    else:
+        video_file = file_path
+
+    if video_file:
+        if not download_audio_only:
+            audio_file = extract_audio(video_file)
+        else:
+            audio_file = video_file
+
+        if audio_file:
+            output_path = input("Enter the output SRT file path: ")
+            if output_path:
+                generate_srt(audio_file, output_path, transcription_lang)
+                print(f"SRT file generated: {output_path}")
+                logging.info(f"SRT file generated: {output_path}")
+
 
 def main():
     print("Starting main function...")  # Stampa di debug
@@ -919,9 +981,11 @@ def main():
     parser.add_argument("--download_directory_from_azure", action="store_true", help="Download directory from Azure Blob Storage")
     parser.add_argument("--container_name", type=str, help="Container name for Azure Blob storage")
     parser.add_argument("--azure_directory", type=str, help="Directory path in Azure Blob storage")
+    parser.add_argument("--url", type=str, help="URL of the video to download")
+    parser.add_argument("--transcription_lang", type=str, default="en", help="Language for transcription")
 
     args = parser.parse_args()
-
+    
     global translations
     translations = load_translations(args.language)
     print("Translations loaded.")  # Stampa di debug
@@ -948,6 +1012,17 @@ def main():
     if args.gui:
         launch_gui()
         return
+
+    if args.operation == "process_video":
+        process_video(
+            url=args.url,
+            file_path=args.file_path,
+            download_audio_only=args.download_audio_only,
+            transcription_lang=args.transcription_lang
+        )
+    else:
+        print(f"Unknown operation: {args.operation}")
+        logging.error(f"Unknown operation: {args.operation}")
 
     # Handle the play video operation
     if args.play_video:
