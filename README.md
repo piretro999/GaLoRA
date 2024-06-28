@@ -30,7 +30,7 @@ The GUI component provides a user-friendly interface that simplifies interaction
 - **Visualization**: Better visualization of processes and data, making it easier to manage complex tasks.
 - **Accessibility**: Accessible to users who are not comfortable with command-line operations.
 
-## What is a Local Resource Access (LoRA) Manager?
+## What is a Low RANK (LoRA) Manager?
 
 LoRA, or Low-Rank Adaptation, is a technique used in machine learning to efficiently fine-tune pre-trained language models. It involves adapting only a low-rank subset of the model's parameters, reducing the computational cost and time required for fine-tuning. This approach makes it possible to adapt models to new tasks with fewer resources and less data.
 
