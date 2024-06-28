@@ -1,6 +1,6 @@
 # GaLoRA
 
-GaLoRA is the definitive evolution of the previous solutions Lora Help and MagicALora. This solution represents the future development under the name GaLoRA, providing enhanced features and capabilities for managing and processing content for AI systems using Local Resource Access (LoRa) technology.
+GaLoRA is the definitive evolution of the previous solutions Lora Help and MagicALora. This solution represents the future development under the name GaLoRA, providing enhanced features and capabilities for managing and processing content for AI systems using Low RANK (LoRA) technology.
 
 ## Features
 
