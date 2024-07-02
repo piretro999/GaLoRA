@@ -40,5 +40,6 @@
     "seleziona_directory_sorgente": "Quellverzeichnis Auswählen",
     "input": "Eingabe",
     "nuova_parola_chiave": "Neues Schlüsselwort:",
-    "configurazione_salvata": "Konfiguration Gespeichert."
+    "configurazione_salvata": "Konfiguration Gespeichert.",
+	"output_srt_file": "Output SRT File"
 }

@@ -40,5 +40,6 @@
     "seleziona_directory_sorgente": "Selectați Directorul Sursă",
     "input": "Intrare",
     "nuova_parola_chiave": "Cuvânt Cheie Nou:",
-    "configurazione_salvata": "Configurație Salvată."
+    "configurazione_salvata": "Configurație Salvată.",
+	"output_srt_file": "Output SRT File"
 }

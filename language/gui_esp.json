@@ -40,5 +40,6 @@
     "seleziona_directory_sorgente": "Seleccionar Directorio de Fuente",
     "input": "Entrada",
     "nuova_parola_chiave": "Nueva Palabra Clave:",
-    "configurazione_salvata": "Configuración Guardada."
+    "configurazione_salvata": "Configuración Guardada.",
+	"output_srt_file": "Output SRT File"
 }

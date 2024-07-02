@@ -40,5 +40,6 @@
     "seleziona_directory_sorgente": "Sélectionner Répertoire Source",
     "input": "Entrée",
     "nuova_parola_chiave": "Nouveau Mot Clé:",
-    "configurazione_salvata": "Configuration Enregistrée."
+    "configurazione_salvata": "Configuration Enregistrée.",
+	"output_srt_file": "Output SRT File"
 }

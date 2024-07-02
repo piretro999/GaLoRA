@@ -40,5 +40,6 @@
     "seleziona_directory_sorgente": "Wybierz Katalog Źródłowy",
     "input": "Wejście",
     "nuova_parola_chiave": "Nowe Słowo Kluczowe:",
-    "configurazione_salvata": "Konfiguracja Zapisana."
+    "configurazione_salvata": "Konfiguracja Zapisana.",
+	"output_srt_file": "Output SRT File"
 }
