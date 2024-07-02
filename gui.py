@@ -7,33 +7,42 @@ import json
 import os
 import logging
 
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
 # Global variable for language
 lang = {}
 
-# Function to execute command
+# 1. execute_command: Executes a shell command and displays the result
 def execute_command(command):
+    logging.debug(f"Executing command: {command}")
     try:
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
         if result.returncode == 0:
+            logging.info(f"Command succeeded: {command}")
             messagebox.showinfo("Success", f"Command succeeded: {command}")
         else:
+            logging.error(f"Command failed: {command}\n{result.stderr}")
             messagebox.showerror("Error", f"Command failed: {command}\n{result.stderr}")
     except Exception as e:
+        logging.error(f"Command execution error: {str(e)}")
         messagebox.showerror("Error", f"Command execution error: {str(e)}")
 
-# Load language translations from JSON file
+# 2. load_language: Loads language translations from a JSON file
 def load_language(language_code):
     global lang
+    file_path = os.path.join('language', f'gui_{language_code}.json')
+    logging.debug(f"Loading language: {file_path}")
     try:
-        file_path = os.path.join('language', f'gui_{language_code}.json')
         with open(file_path, 'r', encoding='utf-8') as file:
             lang = json.load(file)
     except Exception as e:
         logging.error(f"Failed to load language file: {file_path} - {str(e)}")
         messagebox.showerror("Error", f"Failed to load language file: {str(e)}")
 
-# Function to update the interface language
+# 3. update_language: Updates the interface language
 def update_language():
+    logging.debug("Updating interface with selected language")
     try:
         app.notebook.tab(0, text=lang['produzione_srt'])
         app.notebook.tab(1, text=lang['test_srt'])
@@ -47,6 +56,7 @@ def update_language():
         app.label_language.config(text=lang['lingua'])
         app.save_srt_button.config(text=lang['salva_srt'])
         app.run_produzione_srt_button.config(text=lang['lancia_procedura'])
+        app.label_output_srt_file.config(text=lang['output_srt_file'])
 
         app.label_test_video.config(text=lang['file_video'])
         app.label_test_srt.config(text=lang['file_srt'])
@@ -82,30 +92,36 @@ def update_language():
         logging.error(f"Missing language key: {str(e)}")
         messagebox.showerror("Error", f"Missing language key: {str(e)}")
 
-# Save configuration to JSON file
+# 4. save_configuration: Saves the configuration to a JSON file
 def save_configuration(config, file_path):
+    logging.debug(f"Saving configuration: {file_path}")
     try:
         with open(file_path, 'w', encoding='utf-8') as config_file:
             json.dump(config, config_file, indent=4)
+        logging.info(f"Configuration saved successfully: {file_path}")
         messagebox.showinfo("Success", lang.get('configurazione_salvata', "Configurazione salvata."))
     except Exception as e:
         logging.error(f"Failed to save configuration: {str(e)}")
         messagebox.showerror("Error", f"Failed to save configuration: {str(e)}")
 
-# Load configuration from JSON file
+# 5. load_configuration: Loads the configuration from a JSON file
 def load_configuration(file_path):
+    logging.debug(f"Loading configuration: {file_path}")
     try:
         with open(file_path, 'r', encoding='utf-8') as config_file:
-            return json.load(config_file)
+            config = json.load(config_file)
+            logging.info(f"Configuration loaded successfully: {file_path}")
+            return config
     except Exception as e:
         logging.error(f"Failed to load configuration: {str(e)}")
         messagebox.showerror("Error", f"Failed to load configuration: {str(e)}")
         return {}
 
-# GUI class
+# 6. GaloraGUI: Main GUI class
 class GaloraGUI(tk.Tk):
     def __init__(self):
         super().__init__()
+        logging.debug("Initializing GUI")
         self.title("Galora Management")
 
         self.animating = True
@@ -113,42 +129,43 @@ class GaloraGUI(tk.Tk):
 
         self.start_animation()
 
+    # 7. start_animation: Starts the animation
     def start_animation(self):
+        logging.debug("Starting animation")
         self.animation_image_path = "galora.png"
         self.animation_image = Image.open(self.animation_image_path)
 
-        # Resize the image to half
         self.animation_image = self.animation_image.resize((self.animation_image.width // 2, self.animation_image.height // 2), Image.LANCZOS)
         self.animation_image = ImageTk.PhotoImage(self.animation_image)
 
-        # Conversione da centimetri a pixel
         cm_to_pixels = lambda cm: int(cm * 37.7952755906)
 
-        # Calcola nuove dimensioni
         self.new_width = self.animation_image.width() + cm_to_pixels(2)
         self.new_height = self.animation_image.height() + cm_to_pixels(3)
 
-        # Imposta le dimensioni della GUI
         self.geometry(f"{self.new_width}x{self.new_height}")
 
         self.animation_label = tk.Label(self, image=self.animation_image)
-        self.animation_label.image = self.animation_image  # Keep reference to avoid garbage collection
+        self.animation_label.image = self.animation_image
         self.animation_label.place(relx=0.5, rely=0.5, anchor='center')
 
-        # Start the animation after two seconds
         self.after(2000, self.run_animation)
 
+    # 8. run_animation: Runs the animation
     def run_animation(self):
+        logging.debug("Running animation")
         self.animate_image(self.animation_label)
 
+    # 9. animate_image: Animates the image
     def animate_image(self, label):
+        logging.debug("Animating image")
         width, height = self.animation_image.width(), self.animation_image.height()
 
         def update_image(scale):
             nonlocal width, height
             if scale <= 0:
                 label.destroy()
-                self.init_gui()  # Call init_gui to initialize the main GUI
+                self.init_gui()
                 return
 
             scaled_width = int(width * scale)
@@ -156,30 +173,28 @@ class GaloraGUI(tk.Tk):
 
             scaled_image = self.animation_image._PhotoImage__photo.subsample(int(1 / scale))
             label.configure(image=scaled_image)
-            label.image = scaled_image  # Keep reference to avoid garbage collection
-            label.place(x=0, y=0)  # Place the image at the top-left corner
+            label.image = scaled_image
+            label.place(x=0, y=0)
 
             self.update()
             self.after(50, lambda: update_image(scale - 0.05))
 
         update_image(1)
 
+    # 10. init_gui: Initializes the main GUI
     def init_gui(self):
-        # Load the image
+        logging.debug("Initializing main GUI")
         image_path = "galora.png"
         img = Image.open(image_path)
-        
-        # Resize the image to 3 cm x 3 cm
+
         cm_to_pixels = lambda cm: int(cm * 37.7952755906)
         img = img.resize((cm_to_pixels(3), cm_to_pixels(3)), Image.LANCZOS)
         img = ImageTk.PhotoImage(img)
 
-        # Create a label for the image
         img_label = tk.Label(self, image=img)
-        img_label.image = img  # Keep a reference to avoid garbage collection
+        img_label.image = img
         img_label.place(x=10, y=10)
 
-        # Language selection menu
         self.languages = {
             "English": "eng",
             "Italiano": "ita",
@@ -198,7 +213,6 @@ class GaloraGUI(tk.Tk):
         self.notebook = ttk.Notebook(self)
         self.notebook.place(x=10, y=cm_to_pixels(3) + 20, width=self.new_width - 20, height=self.new_height - cm_to_pixels(3) - 30)
 
-        # Create tabs
         self.tab1 = ttk.Frame(self.notebook)
         self.tab2 = ttk.Frame(self.notebook)
         self.tab3 = ttk.Frame(self.notebook)
@@ -217,11 +231,15 @@ class GaloraGUI(tk.Tk):
         self.create_produzione_json_tab()
         self.create_setup_tab()
 
+    # 11. change_language: Changes the language of the interface
     def change_language(self, language):
+        logging.debug(f"Changing language: {language}")
         load_language(self.languages[language])
         update_language()
 
+    # 12. create_srt_tab: Creates the SRT tab
     def create_srt_tab(self):
+        logging.debug("Creating SRT tab")
         self.label_video_locale = tk.Label(self.tab1, text=lang.get('carica_video_locale', "Carica video locale"))
         self.label_video_locale.grid(row=0, column=0, padx=10, pady=10, sticky='w')
         self.video_local_path = tk.Entry(self.tab1, width=50)
@@ -248,7 +266,15 @@ class GaloraGUI(tk.Tk):
         self.run_produzione_srt_button = tk.Button(self.tab1, text=lang.get('lancia_procedura', "Lancia Procedura"), command=self.run_produzione_srt)
         self.run_produzione_srt_button.grid(row=4, column=1, padx=10, pady=10, sticky='ew')
 
+        # New output SRT file path field
+        self.label_output_srt_file = tk.Label(self.tab1, text=lang.get('output_srt_file', "Output SRT File"))
+        self.label_output_srt_file.grid(row=5, column=0, padx=10, pady=10, sticky='w')
+        self.output_srt_file = tk.Entry(self.tab1, width=50, state='readonly')
+        self.output_srt_file.grid(row=5, column=1, padx=10, pady=10, sticky='ew')
+
+    # 13. create_test_srt_tab: Creates the Test SRT tab
     def create_test_srt_tab(self):
+        logging.debug("Creating Test SRT tab")
         self.label_test_video = tk.Label(self.tab2, text=lang.get('file_video', "File video"))
         self.label_test_video.grid(row=0, column=0, padx=10, pady=10, sticky='w')
         self.test_video_path = tk.Entry(self.tab2, width=50)
@@ -264,7 +290,9 @@ class GaloraGUI(tk.Tk):
         self.play_video_button = tk.Button(self.tab2, text=lang.get('play_video', "Play Video"), command=self.play_video)
         self.play_video_button.grid(row=2, column=0, columnspan=3, padx=10, pady=10, sticky='ew')
 
+    # 14. create_translitterazione_tab: Creates the Transliteration tab
     def create_translitterazione_tab(self):
+        logging.debug("Creating Transliteration tab")
         self.label_sorgenti = tk.Label(self.tab3, text=lang.get('sorgenti', "Sorgenti"))
         self.label_sorgenti.grid(row=0, column=0, padx=10, pady=10, sticky='w')
         self.source_listbox = tk.Listbox(self.tab3)
@@ -284,7 +312,9 @@ class GaloraGUI(tk.Tk):
         self.run_translitterazione_button = tk.Button(self.tab3, text=lang.get('esegui_traslitterazione', "Esegui Traslitterazione"), command=self.run_translitterazione)
         self.run_translitterazione_button.grid(row=4, column=0, columnspan=3, padx=10, pady=10, sticky='ew')
 
+    # 15. create_produzione_json_tab: Creates the JSON Production tab
     def create_produzione_json_tab(self):
+        logging.debug("Creating JSON Production tab")
         self.label_parole_chiave = tk.Label(self.tab4, text=lang.get('parole_chiave', "Parole Chiave"))
         self.label_parole_chiave.grid(row=0, column=0, padx=10, pady=10, sticky='w')
         self.keyword_listbox = tk.Listbox(self.tab4)
@@ -304,7 +334,9 @@ class GaloraGUI(tk.Tk):
         self.run_produzione_json_button = tk.Button(self.tab4, text=lang.get('esegui_produzione_json', "Esegui Produzione JSON"), command=self.run_produzione_json)
         self.run_produzione_json_button.grid(row=4, column=0, columnspan=3, padx=10, pady=10, sticky='ew')
 
+    # 16. create_setup_tab: Creates the Setup tab
     def create_setup_tab(self):
+        logging.debug("Creating Setup tab")
         self.label_local_dirs = tk.Label(self.tab5, text=lang.get('directory_locali', "Directory locali"))
         self.label_local_dirs.grid(row=0, column=0, padx=10, pady=10, sticky='w')
         self.local_dirs_listbox = tk.Listbox(self.tab5)
@@ -345,109 +377,157 @@ class GaloraGUI(tk.Tk):
         self.load_config_button = tk.Button(self.tab5, text=lang.get('carica_configurazione', "Carica Configurazione"), command=self.load_config)
         self.load_config_button.grid(row=8, column=2, padx=10, pady=10, sticky='ew')
 
+    # 17. browse_video_local: Opens a file dialog to browse for a local video file
     def browse_video_local(self):
+        logging.debug("Browsing local video")
         video_path = filedialog.askopenfilename(title=lang.get('seleziona_file_video', "Seleziona File Video"))
         if video_path:
             self.video_local_path.delete(0, tk.END)
             self.video_local_path.insert(0, video_path)
 
+    # 18. browse_test_video: Opens a file dialog to browse for a test video file
     def browse_test_video(self):
+        logging.debug("Browsing test video")
         video_path = filedialog.askopenfilename(title=lang.get('seleziona_file_video', "Seleziona File Video"))
         if video_path:
             self.test_video_path.delete(0, tk.END)
             self.test_video_path.insert(0, video_path)
 
+    # 19. browse_test_srt: Opens a file dialog to browse for a test SRT file
     def browse_test_srt(self):
+        logging.debug("Browsing test SRT file")
         srt_path = filedialog.askopenfilename(title=lang.get('seleziona_file_srt', "Seleziona File SRT"))
         if srt_path:
             self.test_srt_path.delete(0, tk.END)
             self.test_srt_path.insert(0, srt_path)
 
+    # 20. browse_dest_txt: Opens a file dialog to browse for a destination TXT directory
     def browse_dest_txt(self):
+        logging.debug("Browsing destination TXT directory")
         dest = filedialog.askdirectory(title=lang.get('seleziona_directory_destinazione_txt', "Seleziona Directory Destinazione TXT"))
         if dest:
             self.dest_txt.delete(0, tk.END)
             self.dest_txt.insert(0, dest)
 
+    # 21. browse_dest_json: Opens a file dialog to browse for a destination JSON directory
     def browse_dest_json(self):
+        logging.debug("Browsing destination JSON directory")
         dest = filedialog.askdirectory(title=lang.get('seleziona_directory_destinazione_json', "Seleziona Directory Destinazione JSON"))
         if dest:
             self.dest_json.delete(0, tk.END)
             self.dest_json.insert(0, dest)
 
+    # 22. save_srt: Opens a file dialog to save an SRT file
     def save_srt(self):
+        logging.debug("Saving SRT file")
         file_path = filedialog.asksaveasfilename(defaultextension=".srt", filetypes=[("SRT files", "*.srt")])
         if file_path:
             self.srt_save_path = file_path
+            self.output_srt_file.config(state='normal')
+            self.output_srt_file.delete(0, tk.END)
+            self.output_srt_file.insert(0, file_path)
+            self.output_srt_file.config(state='readonly')
 
+    # 23. run_produzione_srt: Runs the SRT production command
     def run_produzione_srt(self):
+        logging.debug("Running SRT production")
         video_local = self.video_local_path.get()
         video_url = self.video_url.get()
         audio_only = self.audio_only.get()
         language = self.selected_language.get()
-        command = f"python galora.py --operation generate_srt --video_path \"{video_local}\" --url \"{video_url}\" --audio_only {audio_only} --language {language} --output_dir \"{self.srt_save_path}\""
+        output_dir = os.path.dirname(self.output_srt_file.get())
+        output_srt_file = self.output_srt_file.get()
+        if audio_only:
+            command = f"python galora.py --operation generate_srt --file_path \"{video_local}\" --audio_only --language {language} --output_dir \"{output_srt_file}\""
+        else:
+            command = f"python galora.py --operation generate_srt --file_path \"{video_local}\" --language {language} --output_dir \"{output_srt_file}\""
+
         execute_command(command)
 
+    # 24. add_source: Opens a directory dialog to add a source directory
     def add_source(self):
+        logging.debug("Adding source")
         source = filedialog.askdirectory(title=lang.get('seleziona_directory_sorgente', "Seleziona Directory Sorgente"))
         if source:
             self.source_listbox.insert(tk.END, source)
 
+    # 25. remove_source: Removes the selected source from the listbox
     def remove_source(self):
+        logging.debug("Removing source")
         selected = self.source_listbox.curselection()
         if selected:
             self.source_listbox.delete(selected)
 
+    # 26. run_translitterazione: Runs the transliteration command
     def run_translitterazione(self):
+        logging.debug("Running transliteration")
         sources = list(self.source_listbox.get(0, tk.END))
         dest_txt = self.dest_txt.get()
         command = f"python galora.py --operation handle_directory --directory_path {' '.join(sources)} --output_dir {dest_txt}"
         execute_command(command)
 
+    # 27. add_keyword: Opens a dialog to add a new keyword
     def add_keyword(self):
+        logging.debug("Adding keyword")
         keyword = askstring(lang.get('input', "Input"), lang.get('nuova_parola_chiave', "Nuova Parola Chiave:"))
         if keyword:
             self.keyword_listbox.insert(tk.END, keyword)
 
+    # 28. remove_keyword: Removes the selected keyword from the listbox
     def remove_keyword(self):
+        logging.debug("Removing keyword")
         selected = self.keyword_listbox.curselection()
         if selected:
             self.keyword_listbox.delete(selected)
 
+    # 29. run_produzione_json: Runs the JSON production command
     def run_produzione_json(self):
+        logging.debug("Running JSON production")
         keywords = list(self.keyword_listbox.get(0, tk.END))
         dest_json = self.dest_json.get()
         sources = list(self.source_listbox.get(0, tk.END))
         command = f"python galora.py --operation process_keywords --directory_path {' '.join(sources)} --output_dir {dest_json} --keywords {' '.join(keywords)}"
         execute_command(command)
 
+    # 30. play_video: Runs the command to play video with SRT
     def play_video(self):
+        logging.debug("Playing video")
         video_path = self.test_video_path.get()
         srt_path = self.test_srt_path.get()
-        command = f"python galora.py --operation play_video --video_path \"{video_path}\" --srt_path \"{srt_path}\""
+        command = f"python galora.py --play_video --video_path \"{video_path}\" --srt_path \"{srt_path}\""
         execute_command(command)
 
+    # 31. add_local_directory: Opens a directory dialog to add a local directory
     def add_local_directory(self):
+        logging.debug("Adding local directory")
         directory = filedialog.askdirectory(title=lang.get('seleziona_directory_locale', "Seleziona Directory Locale"))
         if directory:
             self.local_dirs_listbox.insert(tk.END, directory)
 
+    # 32. remove_local_directory: Removes the selected local directory from the listbox
     def remove_local_directory(self):
+        logging.debug("Removing local directory")
         selected = self.local_dirs_listbox.curselection()
         if selected:
             self.local_dirs_listbox.delete(selected)
 
+    # 33. add_ignore_directory: Opens a directory dialog to add an ignore directory
     def add_ignore_directory(self):
+        logging.debug("Adding ignore directory")
         directory = filedialog.askdirectory(title=lang.get('seleziona_directory_da_ignorare', "Seleziona Directory da Ignorare"))
         if directory:
             self.ignore_dirs_listbox.insert(tk.END, directory)
 
+    # 34. remove_ignore_directory: Removes the selected ignore directory from the listbox
     def remove_ignore_directory(self):
+        logging.debug("Removing ignore directory")
         selected = self.ignore_dirs_listbox.curselection()
         if selected:
             self.ignore_dirs_listbox.delete(selected)
 
+    # 35. save_config: Opens a file dialog to save the current configuration
     def save_config(self):
+        logging.debug("Saving configuration")
         config = {
             "sources": list(self.source_listbox.get(0, tk.END)),
             "dest_txt": self.dest_txt.get(),
@@ -464,7 +544,9 @@ class GaloraGUI(tk.Tk):
         if file_path:
             save_configuration(config, file_path)
 
+    # 36. load_config: Opens a file dialog to load a configuration
     def load_config(self):
+        logging.debug("Loading configuration")
         file_path = filedialog.askopenfilename(defaultextension=".json", filetypes=[("JSON files", "*.json")])
         if file_path:
             config = load_configuration(file_path)
