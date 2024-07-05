@@ -12,6 +12,8 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 
 # Global variable for language
 lang = {}
+#Global variable for version
+GLversion = "galora"
 
 # 1. execute_command: Executes a shell command and displays the result
 def execute_command(command):
@@ -438,9 +440,9 @@ class GaloraGUI(tk.Tk):
         output_dir = os.path.dirname(self.output_srt_file.get())
         output_srt_file = self.output_srt_file.get()
         if audio_only:
-            command = f"python galora.py --operation generate_srt --file_path \"{video_local}\" --audio_only --language {language} --output_dir \"{output_srt_file}\""
+            command = f"python \"{GLversion}\".py --operation generate_srt --file_path \"{video_local}\" --audio_only --language {language} --output_dir \"{output_srt_file}\""
         else:
-            command = f"python galora.py --operation generate_srt --file_path \"{video_local}\" --language {language} --output_dir \"{output_srt_file}\""
+            command = f"python \"{GLversion}\".py --operation generate_srt --file_path \"{video_local}\" --language {language} --output_dir \"{output_srt_file}\""
 
         execute_command(command)
 
@@ -463,7 +465,7 @@ class GaloraGUI(tk.Tk):
         logging.debug("Running transliteration")
         sources = list(self.source_listbox.get(0, tk.END))
         dest_txt = self.dest_txt.get()
-        command = f"python galora.py --operation handle_directory --directory_path {' '.join(sources)} --output_dir {dest_txt}"
+        command = f"python \"{GLversion}\".py --operation handle_directory --directory_path {' '.join(sources)} --output_dir {dest_txt}"
         execute_command(command)
 
     # 27. add_keyword: Opens a dialog to add a new keyword
@@ -486,7 +488,7 @@ class GaloraGUI(tk.Tk):
         keywords = list(self.keyword_listbox.get(0, tk.END))
         dest_json = self.dest_json.get()
         sources = list(self.source_listbox.get(0, tk.END))
-        command = f"python galora.py --operation process_keywords --directory_path {' '.join(sources)} --output_dir {dest_json} --keywords {' '.join(keywords)}"
+        command = f"python \"{GLversion}\".py --operation process_keywords --directory_path {' '.join(sources)} --output_dir {dest_json} --keywords {' '.join(keywords)}"
         execute_command(command)
 
     # 30. play_video: Runs the command to play video with SRT
@@ -494,7 +496,7 @@ class GaloraGUI(tk.Tk):
         logging.debug("Playing video")
         video_path = self.test_video_path.get()
         srt_path = self.test_srt_path.get()
-        command = f"python galora.py --play_video --video_path \"{video_path}\" --srt_path \"{srt_path}\""
+        command = f"python \"{GLversion}\".py --play_video --video_path \"{video_path}\" --srt_path \"{srt_path}\""
         execute_command(command)
 
     # 31. add_local_directory: Opens a directory dialog to add a local directory
